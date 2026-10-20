@@ -1,6 +1,13 @@
 package dev.touchlab.app.feature.play
 
-import androidx.compose.foundation.background
+import dev.touchlab.app.feature.jelly.JellyScreen
+import dev.touchlab.app.settings.Settings
+import dev.touchlab.app.ui.Toy
+import dev.touchlab.app.ui.components.DustIllustration
+import dev.touchlab.app.ui.components.JellyIllustration
+import dev.touchlab.app.ui.components.MarblesIllustration
+import dev.touchlab.app.ui.components.PlayScaffold
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,26 +19,36 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.gestures.detectTapGestures
-import dev.touchlab.app.settings.Settings
-import dev.touchlab.app.ui.Toy
-import dev.touchlab.app.ui.components.DustIllustration
-import dev.touchlab.app.ui.components.JellyIllustration
-import dev.touchlab.app.ui.components.MarblesIllustration
-import dev.touchlab.app.ui.components.PlayScaffold
-import dev.touchlab.app.ui.theme.Background
 
-/**
- * Temporary Phase 1 shell. Each toy is replaced by its real physics screen in
- * Phases 2-4. Controls are already live: pause freezes the shell, reset is
- * observable through the reset counter.
- */
 @Composable
 fun PlayShell(
+    toy: Toy,
+    settings: Settings,
+    externallyPaused: Boolean,
+    onBack: () -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    if (toy == Toy.Jelly) {
+        JellyScreen(
+            settings = settings,
+            externallyPaused = externallyPaused,
+            onBack = onBack,
+            onOpenSettings = onOpenSettings,
+        )
+        return
+    }
+    PlaceholderToy(toy, settings, externallyPaused, onBack, onOpenSettings)
+}
+
+/**
+ * Temporary Phase 1 shell for Dust and Marbles, replaced by their physics
+ * screens in Phases 3-4.
+ */
+@Composable
+private fun PlaceholderToy(
     toy: Toy,
     settings: Settings,
     externallyPaused: Boolean,
@@ -68,11 +85,6 @@ fun PlayShell(
                     Toy.Marbles -> MarblesIllustration(Modifier.fillMaxSize())
                 }
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent),
-            )
         }
     }
 }

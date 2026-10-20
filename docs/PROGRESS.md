@@ -78,3 +78,39 @@ after its verification commands have actually run.
   - Home bottom footnote can require a small scroll on 1080x2400 with large
     system font; will re-check in Phase 6.
 - 下一步：Phase 2 — JellyPhysics, unit tests, Canvas gestures and feedback.
+
+---
+
+## Phase 2 — Jelly physics toy
+- 状态：DONE
+- 实现内容：
+  - `JellyPhysics`: pure Kotlin, 24-point closed outline, per-point damped
+    spring, gaussian local indentation, volume bulge on the far side, independent
+    center spring-follow with grab offset, boundary clamping, displacement and
+    velocity limits, NaN guards, reset and resize.
+  - `JellyScreen`: 120Hz fixed-step simulation driven by `withFrameNanos`,
+    frame dt clamped to 50ms with max 6 substeps, lifecycle RESUMED gating,
+    pause/resume, reset, first-touch hint dismissal.
+  - Smooth closed Catmull-Rom-derived cubic path, mint radial body, shadow,
+    clipped highlights, contact soft spot.
+  - Haptics: one tap on press, one on release (never per frame), gated by the
+    user setting.
+  - Real gesture handling with `awaitEachGesture` down/move/up/cancel and
+    explicit consumption; paused canvas does not accept input.
+- 修改文件：
+  - `feature/jelly/JellyPhysics.kt`, `feature/jelly/JellyScreen.kt`
+  - `feedback/Haptics.kt`, `feature/play/PlayShell.kt`
+  - `app/src/test/java/dev/touchlab/app/physics/JellyPhysicsTest.kt`
+- 验证命令与退出码：
+  - `./gradlew.bat :app:testDebugUnitTest :app:assembleDebug` → 0
+    - 8 Jelly unit tests, 0 failures.
+  - Installed on `touchlab_api34` and interacted via adb motion events.
+- 证据：
+  - Unit XML: `app/build/test-results/testDebugUnitTest/TEST-dev.touchlab.app.physics.JellyPhysicsTest.xml`
+  - `docs/screenshots/phase2-jelly-rest.png`
+  - `docs/screenshots/phase2-jelly-press.png`
+- 已知问题：
+  - The local indentation at the pressed edge is visible but subtle on a
+    ～110dp-radius blob; amplitude will be re-tuned in Phase 6 visual polish.
+  - No sound yet (Phase 5).
+- 下一步：Phase 3 — Magnet Dust.
