@@ -5,14 +5,12 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -30,19 +28,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.currentStateAsState
+import dev.touchlab.app.feature.play.rememberPhysicsFrameCounter
+import dev.touchlab.app.feature.play.rememberSimulationRunning
 import dev.touchlab.app.feedback.rememberHaptics
 import dev.touchlab.app.settings.Settings
 import dev.touchlab.app.ui.Toy
 import dev.touchlab.app.ui.components.PlayScaffold
 import dev.touchlab.app.ui.theme.JellyMint
-import kotlinx.coroutines.isActive
-
-private const val FIXED_STEP = 1f / 120f
-private const val MAX_FRAME_SECONDS = 0.05f
-private const val MAX_SUBSTEPS = 6
 
 @Composable
 fun JellyScreen(
@@ -57,38 +49,13 @@ fun JellyScreen(
     val haptics = rememberHaptics()
     var paused by rememberSaveable { mutableStateOf(false) }
     val isPaused = paused || externallyPaused
-    var frame by remember { mutableIntStateOf(0) }
-
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val lifecycleState by lifecycle.currentStateAsState()
-    val running = !isPaused && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
+    var manualTick by remember { mutableIntStateOf(0) }
+    val running = rememberSimulationRunning(isPaused)
+    val frame = rememberPhysicsFrameCounter(running) { dt -> physics.step(dt) }
 
     val path = remember { Path() }
     val xs = remember { FloatArray(JellyPhysics.POINT_COUNT) }
     val ys = remember { FloatArray(JellyPhysics.POINT_COUNT) }
-
-    LaunchedEffect(running) {
-        if (!running) return@LaunchedEffect
-        var lastFrameNanos = 0L
-        var accumulator = 0f
-        while (isActive) {
-            withFrameNanos { now ->
-                if (lastFrameNanos == 0L) lastFrameNanos = now
-                var realDt = (now - lastFrameNanos) / 1_000_000_000f
-                lastFrameNanos = now
-                realDt = realDt.coerceIn(0f, MAX_FRAME_SECONDS)
-                accumulator += realDt
-                var steps = 0
-                while (accumulator >= FIXED_STEP && steps < MAX_SUBSTEPS) {
-                    physics.step(FIXED_STEP)
-                    accumulator -= FIXED_STEP
-                    steps++
-                }
-                if (steps == MAX_SUBSTEPS) accumulator = 0f
-                frame++
-            }
-        }
-    }
 
     PlayScaffold(
         toy = Toy.Jelly,
@@ -98,7 +65,7 @@ fun JellyScreen(
         onTogglePause = { paused = !paused },
         onReset = {
             physics.reset()
-            frame++
+            manualTick++
         },
         onSettings = onOpenSettings,
     ) { notifyInteraction ->
@@ -109,7 +76,7 @@ fun JellyScreen(
                 .semantics { contentDescription = Toy.Jelly.accessibilityHint }
                 .onSizeChanged { size ->
                     physics.resize(size.width.toFloat(), size.height.toFloat())
-                    frame++
+                    manualTick++
                 }
                 .pointerInput(isPaused, settings.hapticsEnabled) {
                     if (isPaused) return@pointerInput
@@ -145,6 +112,8 @@ fun JellyScreen(
             // drawing, never the composition tree.
             @Suppress("UNUSED_EXPRESSION")
             frame
+            @Suppress("UNUSED_EXPRESSION")
+            manualTick
             drawJelly(physics, path, xs, ys)
         }
     }

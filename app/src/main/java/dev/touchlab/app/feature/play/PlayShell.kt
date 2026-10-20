@@ -1,5 +1,6 @@
 package dev.touchlab.app.feature.play
 
+import dev.touchlab.app.feature.dust.DustScreen
 import dev.touchlab.app.feature.jelly.JellyScreen
 import dev.touchlab.app.settings.Settings
 import dev.touchlab.app.ui.Toy
@@ -31,14 +32,26 @@ fun PlayShell(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    if (toy == Toy.Jelly) {
-        JellyScreen(
-            settings = settings,
-            externallyPaused = externallyPaused,
-            onBack = onBack,
-            onOpenSettings = onOpenSettings,
-        )
-        return
+    when (toy) {
+        Toy.Jelly -> {
+            JellyScreen(
+                settings = settings,
+                externallyPaused = externallyPaused,
+                onBack = onBack,
+                onOpenSettings = onOpenSettings,
+            )
+            return
+        }
+        Toy.Dust -> {
+            DustScreen(
+                settings = settings,
+                externallyPaused = externallyPaused,
+                onBack = onBack,
+                onOpenSettings = onOpenSettings,
+            )
+            return
+        }
+        Toy.Marbles -> Unit
     }
     PlaceholderToy(toy, settings, externallyPaused, onBack, onOpenSettings)
 }

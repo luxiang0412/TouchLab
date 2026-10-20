@@ -114,3 +114,36 @@ after its verification commands have actually run.
     ～110dp-radius blob; amplitude will be re-tuned in Phase 6 visual polish.
   - No sound yet (Phase 5).
 - 下一步：Phase 3 — Magnet Dust.
+
+---
+
+## Phase 3 — Magnet Dust physics toy
+- 状态：DONE
+- 实现内容：
+  - Shared `PhysicsFrameLoop`: 120Hz fixed step, 50ms frame clamp, max 6
+    substeps, lifecycle RESUMED gating, frame counter read only in draw phase.
+  - Refactored Jelly to the shared loop.
+  - `DustPhysics`: 120 fixed particles, deterministic LCG seed 42, softened
+    inverse-square attraction, tangential swirl, soft core repulsion (halo
+    instead of a single-pixel collapse), idle sine drift, damping, speed and
+    acceleration clamps, wall bounce, finite guards, resize scaling, reset.
+  - `DustScreen`: single Canvas for all 120 particles, short velocity trails,
+    touch halo + ring, reduce-motion lowers drift/trail and white glints.
+  - Haptic press/release only, no per-frame haptics.
+- 修改文件：
+  - `feature/play/PhysicsFrameLoop.kt`, `feature/dust/DustPhysics.kt`,
+    `feature/dust/DustScreen.kt`, `feature/jelly/JellyScreen.kt`,
+    `feature/play/PlayShell.kt`
+  - `app/src/test/java/dev/touchlab/app/physics/DustPhysicsTest.kt`
+- 验证命令与退出码：
+  - `./gradlew.bat :app:testDebugUnitTest :app:assembleDebug` → 0
+    - 19 total unit tests (8 Jelly + 11 Dust), 0 failures.
+  - Installed and interacted on `touchlab_api34`.
+- 证据：
+  - Unit XML: `app/build/test-results/testDebugUnitTest/TEST-dev.touchlab.app.physics.DustPhysicsTest.xml`
+  - `docs/screenshots/phase3-dust-idle.png`
+  - `docs/screenshots/phase3-dust-gather.png`
+- 已知问题：
+  - Idle dust is intentionally sparse; brightness will be reviewed in Phase 6.
+  - No sound yet (Phase 5).
+- 下一步：Phase 4 — Marbles.
