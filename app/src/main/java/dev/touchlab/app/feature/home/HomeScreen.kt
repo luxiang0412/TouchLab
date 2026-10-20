@@ -47,8 +47,8 @@ fun HomeScreen(
     onOpenToy: (Toy) -> Unit,
     onOpenSettings: () -> Unit,
     onUiFeedback: () -> Unit = {},
-    versionName: String,
     modifier: Modifier = Modifier,
+    versionName: String,
 ) {
     Box(modifier = modifier.fillMaxSize().background(Background)) {
         AmbientBackdrop()

@@ -76,4 +76,14 @@ audio.
 
 ## Status
 
-MVP in development. See `docs/PROGRESS.md` for the current verified state.
+MVP functionally complete on emulator (API 34): all three toys are playable,
+settings persist, build / unit tests / UI tests / lint / release build all pass.
+
+Device coverage is PARTIAL: audio, vibration and 60 FPS performance still need
+verification on a real phone. See `docs/TEST-REPORT.md` and
+`docs/KNOWN-ISSUES.md` for the exact evidence and gaps.
+
+## Screenshots
+
+Real emulator captures are in `docs/screenshots/` — home, jelly press,
+magnet dust gathering, marbles motion, settings and a 360dp / large-font home.

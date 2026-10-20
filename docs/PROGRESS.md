@@ -208,3 +208,35 @@ after its verification commands have actually run.
   - Splash/thermal details still to be sanity-checked on first cold launch on a
     real device.
 - 下一步：Phase 7 — full test matrix, release build, final reports.
+
+---
+
+## Phase 7 — Tests, performance evidence, release prep
+- 状态：PARTIAL（DONE 条件因无真机不能全部满足）
+- 实现内容：
+  - Ran the full matrix: `assembleDebug`, `testDebugUnitTest` (31/31),
+    `lintDebug` (0 errors), `connectedDebugAndroidTest` (9/9),
+    `assembleRelease` (unsigned APK).
+  - Fixed lint `PropertyEscape` error in `local.properties`
+    (`sdk.dir=C\:/Users/...`), Modifier-ordering warning, removed unused
+    drawable; adaptive-icon folder kept at v26 as required by AAPT.
+  - Stability: scripted interactions (Jelly drag loops, 30s Dust hold, Marbles
+    flicks, toggles/resets) with no FATAL/ANR; rotation safe; 10 background
+    round trips safe.
+  - Captured final screenshots incl. 360dp + font 1.4; recorded emulator-only
+    `gfxinfo` numbers for the record.
+  - Wrote `docs/TEST-REPORT.md` and `docs/KNOWN-ISSUES.md`; updated README.
+- 验证命令与退出码：
+  - `:app:testDebugUnitTest` → 0（31 用例，0 失败）
+  - `:app:lintDebug` → 0（0 error；预期 warning 若干）
+  - `:app:connectedDebugAndroidTest` → 0（9/9）
+  - `:app:assembleRelease` → 0（`app-release-unsigned.apk`，未签名）
+- 证据：
+  - 见 `docs/TEST-REPORT.md` 各表与 `docs/screenshots/`。
+- 已知问题：
+  - 无真机：触觉/音效/真机性能未验证；API 37 与 minSdk 26 设备未实测
+    （详见 `docs/KNOWN-ISSUES.md`）。
+  - Release APK 未签名；包名唯一性/归属需上架前确认。
+- 下一步：
+  - 真机接入后：重跑 connected 测试、实测音效/震动、跑 Macrobenchmark，
+    完善 `TEST-REPORT` 的性能与设备覆盖部分，将判定升级为 DONE。
