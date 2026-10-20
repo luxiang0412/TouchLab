@@ -26,7 +26,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.touchlab.app.feature.play.rememberPhysicsFrameCounter
 import dev.touchlab.app.feature.play.rememberSimulationRunning
+import dev.touchlab.app.feedback.SoundCue
+import dev.touchlab.app.feedback.SoundEngine
 import dev.touchlab.app.feedback.rememberHaptics
+import dev.touchlab.app.feedback.uiFeedback
 import dev.touchlab.app.settings.Settings
 import dev.touchlab.app.ui.Toy
 import dev.touchlab.app.ui.components.PlayScaffold
@@ -37,6 +40,7 @@ import kotlin.math.min
 @Composable
 fun DustScreen(
     settings: Settings,
+    sound: SoundEngine,
     externallyPaused: Boolean,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -62,6 +66,7 @@ fun DustScreen(
             manualTick++
         },
         onSettings = onOpenSettings,
+        onUiFeedback = { uiFeedback(sound, settings, haptics) },
     ) { notifyInteraction ->
         Canvas(
             modifier = Modifier
@@ -79,6 +84,7 @@ fun DustScreen(
                         down.consume()
                         physics.beginTouch(down.position.x, down.position.y)
                         notifyInteraction()
+                        sound.play(SoundCue.DustTouch, settings.soundEnabled)
                         if (settings.hapticsEnabled) haptics.press()
                         var pressed = true
                         try {
@@ -103,7 +109,7 @@ fun DustScreen(
                 },
         ) {
             @Suppress("UNUSED_EXPRESSION")
-            frame
+            frame.value
             @Suppress("UNUSED_EXPRESSION")
             manualTick
             drawDust(physics, settings.reduceMotion)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -36,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -59,6 +58,8 @@ fun LabCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
+    val fontScale = LocalDensity.current.fontScale
+    val cardHeight = (168f + (fontScale - 1f) * 58f).coerceIn(168f, 232f)
     val scale by animateFloatAsState(
         targetValue = if (pressed && !reduceMotion) 0.98f else 1f,
         animationSpec = tween(durationMillis = 180),
@@ -69,7 +70,7 @@ fun LabCard(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(168.dp)
+            .height(cardHeight.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -104,7 +105,7 @@ fun LabCard(
                     text = toy.title,
                     style = MaterialTheme.typography.titleLarge,
                     color = TextPrimary,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(Modifier.height(8.dp))
@@ -143,26 +144,6 @@ fun LabCard(
                         modifier = Modifier.size(18.dp),
                     )
                 }
-            }
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 22.dp, bottom = 24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(toy.accent),
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "Tap to play",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = TextSecondary,
-                )
             }
         }
     }

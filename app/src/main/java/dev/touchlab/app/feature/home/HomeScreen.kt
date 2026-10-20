@@ -46,6 +46,7 @@ fun HomeScreen(
     reduceMotion: Boolean,
     onOpenToy: (Toy) -> Unit,
     onOpenSettings: () -> Unit,
+    onUiFeedback: () -> Unit = {},
     versionName: String,
     modifier: Modifier = Modifier,
 ) {
@@ -80,7 +81,10 @@ fun HomeScreen(
                 LabCard(
                     toy = toy,
                     reduceMotion = reduceMotion,
-                    onClick = { onOpenToy(toy) },
+                    onClick = {
+                        onUiFeedback()
+                        onOpenToy(toy)
+                    },
                 )
             }
 
@@ -91,7 +95,10 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 TextButton(
-                    onClick = onOpenSettings,
+                    onClick = {
+                        onUiFeedback()
+                        onOpenSettings()
+                    },
                     modifier = Modifier
                         .height(48.dp)
                         .testTag("settings_button"),

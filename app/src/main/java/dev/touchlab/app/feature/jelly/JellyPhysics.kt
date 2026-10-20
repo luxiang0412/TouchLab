@@ -36,8 +36,8 @@ class JellyPhysics(
         private const val OUTLINE_STIFFNESS = 150f
         private const val OUTLINE_DAMPING = 6.5f
         private const val OUTLINE_MAX_SPEED = 3200f
-        private const val PRESS_DEPTH_RATIO = 0.16f
-        private const val PRESS_SIGMA = 0.72f
+        private const val PRESS_DEPTH_RATIO = 0.19f
+        private const val PRESS_SIGMA = 0.80f
         private const val VOLUME_BULGE = 0.22f
         private const val MAX_DISPLACEMENT_RATIO = 0.38f
         private const val CENTER_MARGIN_RATIO = 0.96f
@@ -146,10 +146,12 @@ class JellyPhysics(
 
     fun cancelTouch() = endTouch()
 
-    fun step(dt: Float) {
+    fun step(dt: Float, motionScale: Float = 1f) {
         if (!dt.isFinite() || dt <= 0f) return
         if (width <= 0f || height <= 0f) return
         val time = dt.coerceAtMost(MAX_STEP_SECONDS)
+        val scale = motionScale.coerceIn(0f, 1f)
+        val outlineDamping = OUTLINE_DAMPING * (1f + (1f - scale) * 0.85f)
 
         if (touchActive) {
             val targetX = touchX + grabOffsetX
@@ -180,7 +182,7 @@ class JellyPhysics(
             touchDistance = 0f
         }
 
-        val depth = radius * PRESS_DEPTH_RATIO
+        val depth = radius * PRESS_DEPTH_RATIO * (0.55f + 0.45f * scale)
         val uniformPress = touchActive && touchDistance < radius * 0.30f
         val sigmaSquared = PRESS_SIGMA * PRESS_SIGMA
 
@@ -197,7 +199,7 @@ class JellyPhysics(
             }
 
             var v = velocity[i]
-            v += (-OUTLINE_STIFFNESS * (displacement[i] - target) - OUTLINE_DAMPING * v) * time
+            v += (-OUTLINE_STIFFNESS * (displacement[i] - target) - outlineDamping * v) * time
             v = v.coerceIn(-OUTLINE_MAX_SPEED, OUTLINE_MAX_SPEED)
             var d = displacement[i] + v * time
             val limit = radius * MAX_DISPLACEMENT_RATIO

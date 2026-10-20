@@ -1,10 +1,9 @@
 package dev.touchlab.app
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.assertIsOff
-import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -24,12 +23,19 @@ class TouchLabUiTest {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     private fun openToy(tag: String) {
+        // Physics toys animate every frame, so the shared test clock must not
+        // auto-advance or waitForIdle would never settle. Advance manually.
+        composeRule.mainClock.autoAdvance = false
         composeRule.onNodeWithTag(tag).performClick()
+        composeRule.mainClock.advanceTimeBy(600)
         composeRule.onNodeWithTag("play_screen").assertIsDisplayed()
     }
 
     private fun returnHome() {
         composeRule.onNodeWithTag("play_back").performClick()
+        composeRule.mainClock.advanceTimeBy(400)
+        composeRule.mainClock.autoAdvance = true
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
     }
 
@@ -60,9 +66,27 @@ class TouchLabUiTest {
     }
 
     @Test
-    fun marblesOpensResetAndBack() {
+    fun marblesGravityToggleAndReset() {
         openToy("home_marbles_card")
+        composeRule.onNodeWithText("Gravity on").assertIsDisplayed()
+        composeRule.onNodeWithTag("marbles_gravity_toggle").performClick()
+        composeRule.mainClock.advanceTimeBy(100)
+        composeRule.onNodeWithText("Gravity off").assertIsDisplayed()
         composeRule.onNodeWithTag("play_reset").performClick()
+        composeRule.onNodeWithText("Gravity off").assertIsDisplayed()
+        composeRule.onNodeWithTag("play_screen").assertIsDisplayed()
+        returnHome()
+    }
+
+    @Test
+    fun marblesCanvasAcceptsDragGesture() {
+        openToy("home_marbles_card")
+        composeRule.onNodeWithTag("play_canvas").performTouchInput {
+            down(center)
+            moveBy(Offset(0f, -180f))
+            moveBy(Offset(120f, -80f))
+            up()
+        }
         composeRule.onNodeWithTag("play_screen").assertIsDisplayed()
         returnHome()
     }
@@ -72,27 +96,49 @@ class TouchLabUiTest {
         openToy("home_jelly_card")
         composeRule.onNodeWithText("Pause").assertIsDisplayed()
         composeRule.onNodeWithTag("play_pause").performClick()
+        composeRule.mainClock.advanceTimeBy(100)
         composeRule.onNodeWithText("Resume").assertIsDisplayed()
         composeRule.onNodeWithTag("play_pause").performClick()
+        composeRule.mainClock.advanceTimeBy(100)
         composeRule.onNodeWithText("Pause").assertIsDisplayed()
         returnHome()
     }
 
+    private fun isSwitchOn(tag: String): Boolean {
+        val config = composeRule.onNodeWithTag(tag).fetchSemanticsNode().config
+        return config[SemanticsProperties.ToggleableState] == ToggleableState.On
+    }
+
     @Test
-    fun settingsTogglePersistsWithinSession() {
+    fun allThreeSettingsToggleAndPersistWithinSession() {
         composeRule.onNodeWithTag("settings_button").performClick()
         composeRule.onNodeWithTag("settings_sheet").assertIsDisplayed()
-        composeRule.onNodeWithTag("setting_reduce_motion").assertIsOff()
+
+        listOf("setting_sound", "setting_haptic", "setting_reduce_motion").forEach { tag ->
+            val initial = isSwitchOn(tag)
+            composeRule.onNodeWithTag(tag).performClick()
+            composeRule.waitForIdle()
+            check(isSwitchOn(tag) != initial) { "$tag did not toggle" }
+            // Restore so the test leaves no surprising state behind.
+            composeRule.onNodeWithTag(tag).performClick()
+            composeRule.waitForIdle()
+            check(isSwitchOn(tag) == initial) { "$tag did not restore" }
+        }
+
+        val beforeClose = isSwitchOn("setting_reduce_motion")
         composeRule.onNodeWithTag("setting_reduce_motion").performClick()
-        composeRule.onNodeWithTag("setting_reduce_motion").assertIsOn()
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag("settings_done").performClick()
         composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
 
         composeRule.onNodeWithTag("settings_button").performClick()
-        composeRule.onNodeWithTag("setting_reduce_motion").assertIsOn()
-        // Restore the default so other tests see a stable baseline.
+        composeRule.onNodeWithTag("settings_sheet").assertIsDisplayed()
+        check(isSwitchOn("setting_reduce_motion") != beforeClose) {
+            "setting did not survive closing and reopening the sheet"
+        }
         composeRule.onNodeWithTag("setting_reduce_motion").performClick()
-        composeRule.onNodeWithTag("setting_reduce_motion").assertIsOff()
+        composeRule.waitForIdle()
+        check(isSwitchOn("setting_reduce_motion") == beforeClose)
         composeRule.onNodeWithTag("settings_done").performClick()
     }
 
@@ -113,6 +159,9 @@ class TouchLabUiTest {
     fun systemBackReturnsHome() {
         openToy("home_marbles_card")
         Espresso.pressBack()
+        composeRule.mainClock.advanceTimeBy(400)
+        composeRule.mainClock.autoAdvance = true
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
     }
 }

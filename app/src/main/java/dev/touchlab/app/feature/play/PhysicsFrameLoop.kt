@@ -1,6 +1,7 @@
 package dev.touchlab.app.feature.play
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -32,7 +33,7 @@ fun rememberSimulationRunning(paused: Boolean): Boolean {
  * preventing a spiral of death after backgrounding or a long jank.
  */
 @Composable
-fun rememberPhysicsFrameCounter(running: Boolean, step: (Float) -> Unit): Int {
+fun rememberPhysicsFrameCounter(running: Boolean, step: (Float) -> Unit): State<Int> {
     val frame = remember { mutableIntStateOf(0) }
     val currentStep by rememberUpdatedState(step)
 
@@ -58,5 +59,5 @@ fun rememberPhysicsFrameCounter(running: Boolean, step: (Float) -> Unit): Int {
             }
         }
     }
-    return frame.intValue
+    return frame
 }

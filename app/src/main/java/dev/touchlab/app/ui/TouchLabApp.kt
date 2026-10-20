@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.touchlab.app.feature.home.HomeScreen
+import dev.touchlab.app.feedback.SoundEngine
+import dev.touchlab.app.feedback.rememberHaptics
+import dev.touchlab.app.feedback.uiFeedback as playUiFeedback
 import dev.touchlab.app.feature.play.PlayShell
 import dev.touchlab.app.settings.Settings
 import dev.touchlab.app.settings.SettingsRepository
@@ -30,6 +34,12 @@ fun TouchLabApp(versionName: String) {
     val repository = remember(context) { SettingsRepository(context) }
     val scope = rememberCoroutineScope()
     val settings by repository.settings.collectAsStateWithLifecycle(initialValue = Settings())
+    val soundEngine = remember(context) { SoundEngine(context) }
+    val haptics = rememberHaptics()
+
+    DisposableEffect(soundEngine) {
+        onDispose { soundEngine.release() }
+    }
 
     val systemReduceMotion = remember(context) {
         android.provider.Settings.Global.getFloat(
@@ -59,12 +69,14 @@ fun TouchLabApp(versionName: String) {
                     reduceMotion = reduceMotion,
                     onOpenToy = { openToyName = it.name },
                     onOpenSettings = { settingsOpen = true },
+                    onUiFeedback = { playUiFeedback(soundEngine, settings, haptics) },
                     versionName = versionName,
                 )
             } else {
                 PlayShell(
                     toy = toy,
                     settings = settings.copy(reduceMotion = reduceMotion),
+                    sound = soundEngine,
                     externallyPaused = settingsOpen,
                     onBack = { openToyName = null },
                     onOpenSettings = { settingsOpen = true },
@@ -86,6 +98,7 @@ fun TouchLabApp(versionName: String) {
                 scope.launch { repository.setReduceMotion(enabled) }
             },
             onDismiss = { settingsOpen = false },
+            onUiFeedback = { playUiFeedback(soundEngine, settings, haptics) },
         )
     }
 }

@@ -1,6 +1,8 @@
 package dev.touchlab.app.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +46,7 @@ fun SettingsSheet(
     onHapticsChanged: (Boolean) -> Unit,
     onReduceMotionChanged: (Boolean) -> Unit,
     onDismiss: () -> Unit,
+    onUiFeedback: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
@@ -61,6 +64,7 @@ fun SettingsSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 20.dp)
                 .testTag("settings_sheet"),
@@ -82,7 +86,10 @@ fun SettingsSheet(
                 title = "Sound effects",
                 description = "Soft taps when you touch, flick and bounce.",
                 checked = settings.soundEnabled,
-                onCheckedChange = onSoundChanged,
+                onCheckedChange = {
+                    onUiFeedback()
+                    onSoundChanged(it)
+                },
                 tag = "setting_sound",
             )
             HorizontalDivider(color = OutlineSoft.copy(alpha = 0.7f))
@@ -90,7 +97,10 @@ fun SettingsSheet(
                 title = "Haptic feedback",
                 description = "A light tap on touches and impacts, never every frame.",
                 checked = settings.hapticsEnabled,
-                onCheckedChange = onHapticsChanged,
+                onCheckedChange = {
+                    onUiFeedback()
+                    onHapticsChanged(it)
+                },
                 tag = "setting_haptic",
             )
             HorizontalDivider(color = OutlineSoft.copy(alpha = 0.7f))
@@ -98,12 +108,18 @@ fun SettingsSheet(
                 title = "Reduce motion",
                 description = "Calmer drift, softer springs, less decoration.",
                 checked = settings.reduceMotion,
-                onCheckedChange = onReduceMotionChanged,
+                onCheckedChange = {
+                    onUiFeedback()
+                    onReduceMotionChanged(it)
+                },
                 tag = "setting_reduce_motion",
             )
             Spacer(Modifier.height(22.dp))
             Button(
-                onClick = onDismiss,
+                onClick = {
+                    onUiFeedback()
+                    onDismiss()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)

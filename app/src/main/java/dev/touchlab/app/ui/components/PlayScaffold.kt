@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -68,6 +69,7 @@ fun PlayScaffold(
     onTogglePause: () -> Unit,
     onReset: () -> Unit,
     onSettings: () -> Unit,
+    onUiFeedback: () -> Unit = {},
     extraControls: @Composable ColumnScope.() -> Unit = {},
     canvas: @Composable (notifyInteraction: () -> Unit) -> Unit,
 ) {
@@ -89,12 +91,15 @@ fun PlayScaffold(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 8.dp),
+                .heightIn(min = 64.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
-                onClick = onBack,
+                onClick = {
+                    onUiFeedback()
+                    onBack()
+                },
                 modifier = Modifier
                     .size(48.dp)
                     .testTag("play_back"),
@@ -117,6 +122,7 @@ fun PlayScaffold(
                 text = toy.title,
                 style = MaterialTheme.typography.titleLarge,
                 color = TextPrimary,
+                maxLines = 2,
                 modifier = Modifier.weight(1f),
             )
             Surface(
@@ -228,7 +234,10 @@ fun PlayScaffold(
                     label = if (paused) "Resume" else "Pause",
                     accent = toy.accent,
                     filled = false,
-                    onClick = onTogglePause,
+                    onClick = {
+                        onUiFeedback()
+                        onTogglePause()
+                    },
                     tag = "play_pause",
                     modifier = Modifier.weight(1f),
                 )
@@ -237,12 +246,18 @@ fun PlayScaffold(
                     label = "Reset",
                     accent = toy.accent,
                     filled = true,
-                    onClick = onReset,
+                    onClick = {
+                        onUiFeedback()
+                        onReset()
+                    },
                     tag = "play_reset",
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(
-                    onClick = onSettings,
+                    onClick = {
+                        onUiFeedback()
+                        onSettings()
+                    },
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)

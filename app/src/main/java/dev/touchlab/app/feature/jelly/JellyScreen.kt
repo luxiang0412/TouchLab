@@ -30,7 +30,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.touchlab.app.feature.play.rememberPhysicsFrameCounter
 import dev.touchlab.app.feature.play.rememberSimulationRunning
+import dev.touchlab.app.feedback.SoundCue
+import dev.touchlab.app.feedback.SoundEngine
 import dev.touchlab.app.feedback.rememberHaptics
+import dev.touchlab.app.feedback.uiFeedback
 import dev.touchlab.app.settings.Settings
 import dev.touchlab.app.ui.Toy
 import dev.touchlab.app.ui.components.PlayScaffold
@@ -39,6 +42,7 @@ import dev.touchlab.app.ui.theme.JellyMint
 @Composable
 fun JellyScreen(
     settings: Settings,
+    sound: SoundEngine,
     externallyPaused: Boolean,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -51,7 +55,9 @@ fun JellyScreen(
     val isPaused = paused || externallyPaused
     var manualTick by remember { mutableIntStateOf(0) }
     val running = rememberSimulationRunning(isPaused)
-    val frame = rememberPhysicsFrameCounter(running) { dt -> physics.step(dt) }
+    val frame = rememberPhysicsFrameCounter(running) { dt ->
+        physics.step(dt, motionScale = if (settings.reduceMotion) 0.55f else 1f)
+    }
 
     val path = remember { Path() }
     val xs = remember { FloatArray(JellyPhysics.POINT_COUNT) }
@@ -68,6 +74,7 @@ fun JellyScreen(
             manualTick++
         },
         onSettings = onOpenSettings,
+        onUiFeedback = { uiFeedback(sound, settings, haptics) },
     ) { notifyInteraction ->
         Canvas(
             modifier = Modifier
@@ -85,6 +92,7 @@ fun JellyScreen(
                         down.consume()
                         physics.beginTouch(down.position.x, down.position.y)
                         notifyInteraction()
+                        sound.play(SoundCue.JellyPress, settings.soundEnabled)
                         if (settings.hapticsEnabled) haptics.press()
                         var pressed = true
                         try {
@@ -103,6 +111,7 @@ fun JellyScreen(
                             }
                         } finally {
                             physics.endTouch()
+                            sound.play(SoundCue.JellyRelease, settings.soundEnabled)
                             if (settings.hapticsEnabled) haptics.release()
                         }
                     }
@@ -111,7 +120,7 @@ fun JellyScreen(
             // Reading the frame counter in the draw phase invalidates only the
             // drawing, never the composition tree.
             @Suppress("UNUSED_EXPRESSION")
-            frame
+            frame.value
             @Suppress("UNUSED_EXPRESSION")
             manualTick
             drawJelly(physics, path, xs, ys)
@@ -177,7 +186,7 @@ private fun DrawScope.drawJelly(
             size = Size(r * 0.82f, r * 0.40f),
         )
         drawCircle(
-            color = Color.White.copy(alpha = 0.10f),
+            color = Color.White.copy(alpha = 0.055f),
             radius = r * 0.66f,
             center = Offset(cx + r * 0.34f, cy + r * 0.42f),
         )

@@ -147,3 +147,64 @@ after its verification commands have actually run.
   - Idle dust is intentionally sparse; brightness will be reviewed in Phase 6.
   - No sound yet (Phase 5).
 - 下一步：Phase 4 — Marbles.
+
+---
+
+## Phase 5 — Sound, haptics, settings, lifecycle
+- 状态：DONE
+- 实现内容：
+  - `tools/generate_sounds.py`: five original 16-bit WAVs synthesized with the
+    Python standard library, committed under `res/raw/` (jelly press/release,
+    dust touch, marble hit, ui tap).
+  - `SoundEngine`: SoundPool with USAGE_GAME, per-cue rate limiting (50–110ms),
+    silent graceful degradation, DEBUG-only play logs.
+  - Haptics: press/release/impact with internal rate limits (55/130ms), gated
+    by the user setting, no per-frame vibration.
+  - Wired sounds + haptics into all three toys, buttons, cards and settings.
+  - Marbles physics now reports impact strength per frame (`consumeImpact`) for
+    sound/haptic on collisions while still bounded by rate limits.
+  - DataStore settings (sound/haptics/reduce motion) fully effective and wired;
+    reduce motion also modulates Jelly spring amplitude and Dust drift/trails.
+  - Lifecycle handling: physics loop pauses on background/pause/settings sheet;
+    verified 10 home/resume cycles without crash or ANR.
+- 验证命令与退出码：
+  - `./gradlew.bat :app:testDebugUnitTest :app:assembleDebug` → 0
+  - `./gradlew.bat :app:connectedDebugAndroidTest` → 0 (9/9), including new
+    all-three-switches settings test.
+  - Manual on emulator: sound logs appear when enabled and stop when disabled;
+    settings persist after force-stop + relaunch (screenshot evidence).
+  - Emulator has no usable vibrator; haptic calls execute but hardware feedback
+    is recorded as unverified on this environment.
+- 证据：
+  - `docs/screenshots/phase5-settings-toggled.png`,
+    `phase5-settings-persisted.png`
+  - `tools/generate_sounds.py`, `app/src/main/res/raw/*.wav`
+- 已知问题：
+  - Emulator cannot reproduce audible/haptic hardware output; to be verified on
+    a real phone before Play release.
+- 下一步：Phase 6 — visual and adaptive-layout polish.
+
+## Phase 6 — UI/UX polish and layout adaptation
+- 状态：DONE
+- 实现内容：
+  - Adaptive home cards: height grows with system font scale (168→232dp),
+    titles wrap up to 2 lines, removed the redundant "Tap to play" label.
+  - Play top bar adapts to 2-line titles and large fonts.
+  - Settings sheet is scrollable for large fonts; reduce-motion respected.
+  - Jelly: stronger local press indentation, softer secondary highlight.
+  - Marbles: lighter contact shadows.
+  - Android 12+ splash theme with the adaptive icon on a branded background.
+- 验证命令与退出码：
+  - `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest` → 0
+  - Manual on emulator at 360dp width + font scale 1.4: home renders, three
+    cards visible, no truncation of "Magnet Dust", layout scrolls (uiautomator
+    bounds captured), then device restored.
+- 证据：
+  - `docs/screenshots/home-narrow-font.png` (360dp + 1.4 font)
+  - `docs/screenshots/home.png`, `phase2-jelly-*-final.png`,
+    `phase3-dust-*-final.png`, `phase4-marbles-motion-final.png`,
+    `phase4-marbles-floating-final.png`, `settings-final.png`
+- 已知问题：
+  - Splash/thermal details still to be sanity-checked on first cold launch on a
+    real device.
+- 下一步：Phase 7 — full test matrix, release build, final reports.
