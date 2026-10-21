@@ -83,6 +83,12 @@ Device coverage is PARTIAL: audio, vibration and 60 FPS performance still need
 verification on a real phone. See `docs/TEST-REPORT.md` and
 `docs/KNOWN-ISSUES.md` for the exact evidence and gaps.
 
+## Language
+
+English and Simplified Chinese are both supported. TouchLab follows the system
+language by default; you can also force **English** or **中文** from
+Settings → Language. The choice persists across restarts.
+
 ## Screenshots
 
 Real emulator captures are in `docs/screenshots/` — home, jelly press,

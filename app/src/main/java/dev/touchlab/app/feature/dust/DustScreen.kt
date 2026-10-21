@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ fun DustScreen(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
+    val a11y = stringResource(Toy.Dust.accessibilityHintRes)
     val physics = remember { DustPhysics() }
     val haptics = rememberHaptics()
     var paused by rememberSaveable { mutableStateOf(false) }
@@ -72,7 +74,7 @@ fun DustScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("play_canvas")
-                .semantics { contentDescription = Toy.Dust.accessibilityHint }
+                .semantics { contentDescription = a11y }
                 .onSizeChanged { size ->
                     physics.resize(size.width.toFloat(), size.height.toFloat())
                     manualTick++

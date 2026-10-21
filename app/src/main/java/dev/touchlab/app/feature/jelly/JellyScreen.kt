@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,7 @@ fun JellyScreen(
 ) {
     val density = LocalDensity.current
     val desiredRadius = with(density) { 112.dp.toPx() }
+    val a11y = stringResource(Toy.Jelly.accessibilityHintRes)
     val physics = remember(desiredRadius) { JellyPhysics(desiredRadiusPx = desiredRadius) }
     val haptics = rememberHaptics()
     var paused by rememberSaveable { mutableStateOf(false) }
@@ -80,7 +82,7 @@ fun JellyScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("play_canvas")
-                .semantics { contentDescription = Toy.Jelly.accessibilityHint }
+                .semantics { contentDescription = a11y }
                 .onSizeChanged { size ->
                     physics.resize(size.width.toFloat(), size.height.toFloat())
                     manualTick++

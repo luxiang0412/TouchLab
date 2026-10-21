@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -64,13 +65,13 @@ fun HomeScreen(
             BrandWordmark()
             Spacer(Modifier.height(30.dp))
             Text(
-                text = "Pick something\nto play with.",
+                text = stringResource(R.string.home_headline),
                 style = MaterialTheme.typography.displaySmall,
                 color = TextPrimary,
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "Three tiny physics toys. No scores, no rush.",
+                text = stringResource(R.string.home_sub),
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextSecondary,
             )
@@ -111,13 +112,13 @@ fun HomeScreen(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings),
                         style = MaterialTheme.typography.labelLarge,
                         color = TextPrimary,
                     )
                 }
                 Text(
-                    text = "v$versionName",
+                    text = stringResource(R.string.version_prefix, versionName),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                     maxLines = 1,
@@ -126,7 +127,7 @@ fun HomeScreen(
             }
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Made for fingers. Works offline.",
+                text = stringResource(R.string.home_footer),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary.copy(alpha = 0.72f),
             )
@@ -147,7 +148,7 @@ private fun BrandWordmark() {
         Spacer(Modifier.width(10.dp))
         Column {
             Text(
-                text = "TouchLab",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp,
@@ -155,7 +156,7 @@ private fun BrandWordmark() {
                 color = TextPrimary,
             )
             Text(
-                text = "Tiny physics toys",
+                text = stringResource(R.string.brand_tagline),
                 style = MaterialTheme.typography.labelMedium,
                 color = TextSecondary,
             )

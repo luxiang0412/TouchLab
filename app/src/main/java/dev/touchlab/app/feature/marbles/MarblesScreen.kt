@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -35,6 +36,7 @@ import dev.touchlab.app.feature.play.rememberPhysicsFrameCounter
 import dev.touchlab.app.feature.play.rememberSimulationRunning
 import dev.touchlab.app.feedback.SoundCue
 import dev.touchlab.app.feedback.SoundEngine
+import dev.touchlab.app.R
 import dev.touchlab.app.feedback.rememberHaptics
 import dev.touchlab.app.feedback.uiFeedback
 import dev.touchlab.app.settings.Settings
@@ -64,6 +66,7 @@ fun MarblesScreen(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
+    val a11y = stringResource(Toy.Marbles.accessibilityHintRes)
     val physics = remember { MarblesPhysics() }
     val haptics = rememberHaptics()
     var paused by rememberSaveable { mutableStateOf(false) }
@@ -104,7 +107,7 @@ fun MarblesScreen(
                 horizontalArrangement = Arrangement.Center,
             ) {
                 SmallTogglePill(
-                    label = if (gravityOn) "Gravity on" else "Gravity off",
+                    label = stringResource(if (gravityOn) R.string.gravity_on else R.string.gravity_off),
                     checked = gravityOn,
                     accent = MarbleCoral,
                     onToggle = {
@@ -122,7 +125,7 @@ fun MarblesScreen(
                 .fillMaxSize()
                 .padding(horizontal = 4.dp, vertical = 8.dp)
                 .testTag("play_canvas")
-                .semantics { contentDescription = Toy.Marbles.accessibilityHint }
+                .semantics { contentDescription = a11y }
                 .onSizeChanged { size ->
                     physics.resize(size.width.toFloat(), size.height.toFloat())
                     manualTick++

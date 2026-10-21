@@ -1,4 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TouchLab</string>
+    <string name="brand_tagline">Tiny physics toys</string>
+    <string name="home_headline">Pick something\nto play with.</string>
+    <string name="home_sub">Three tiny physics toys. No scores, no rush.</string>
+    <string name="settings">Settings</string>
+    <string name="version_prefix">v%1$s</string>
+    <string name="home_footer">Made for fingers. Works offline.</string>
+
+    <string name="open_toy">Open %1$s</string>
+    <string name="back_toys">Back to toys</string>
+    <string name="open_settings">Open settings</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="reset_label">Reset</string>
+    <string name="paused_title">Paused</string>
+    <string name="paused_desc">The simulation is resting.</string>
+    <string name="paused_status">Paused — nothing is moving.</string>
+
+    <string name="toy_title_jelly">Jelly</string>
+    <string name="toy_subtitle_jelly">Squish it. Stretch it. Let it bounce.</string>
+    <string name="toy_hint_jelly">Press and drag the jelly</string>
+    <string name="toy_a11y_jelly">Interactive jelly toy. Touch and drag to squish and move it.</string>
+
+    <string name="toy_title_dust">Magnet Dust</string>
+    <string name="toy_subtitle_dust">Gather a little universe.</string>
+    <string name="toy_hint_dust">Hold to pull the dust</string>
+    <string name="toy_a11y_dust">Interactive magnet dust toy. Touch and hold to gather the particles.</string>
+
+    <string name="toy_title_marbles">Marbles</string>
+    <string name="toy_subtitle_marbles">Flick. Bounce. Repeat.</string>
+    <string name="toy_hint_marbles">Drag a marble and flick it</string>
+    <string name="toy_a11y_marbles">Interactive marble toy. Drag and flick the marbles around the tray.</string>
+
+    <string name="gravity_on">Gravity on</string>
+    <string name="gravity_off">Gravity off</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Keep it comfortable. Every change applies immediately.</string>
+    <string name="setting_sound">Sound effects</string>
+    <string name="setting_sound_desc">Soft taps when you touch, flick and bounce.</string>
+    <string name="setting_haptic">Haptic feedback</string>
+    <string name="setting_haptic_desc">A light tap on touches and impacts, never every frame.</string>
+    <string name="setting_motion">Reduce motion</string>
+    <string name="setting_motion_desc">Calmer drift, softer springs, less decoration.</string>
+    <string name="setting_language">Language</string>
+    <string name="setting_language_desc">English or 中文. Follows the system by default.</string>
+    <string name="lang_system">System default</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_en">English</string>
+    <string name="settings_done">Done</string>
 </resources>

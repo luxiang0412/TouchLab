@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +59,9 @@ fun LabCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
+    val title = stringResource(toy.titleRes)
+    val subtitle = stringResource(toy.subtitleRes)
+    val openDescription = stringResource(R.string.open_toy, title)
     val fontScale = LocalDensity.current.fontScale
     val cardHeight = (168f + (fontScale - 1f) * 58f).coerceIn(168f, 232f)
     val scale by animateFloatAsState(
@@ -76,13 +80,13 @@ fun LabCard(
                 scaleY = scale
             }
             .testTag("home_${toy.name.lowercase()}_card")
-            .semantics { contentDescription = "Open ${toy.title}" }
+            .semantics { contentDescription = openDescription }
             .clip(RoundedCornerShape(28.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = indication,
                 role = Role.Button,
-                onClickLabel = "Open ${toy.title}",
+                onClickLabel = openDescription,
                 onClick = onClick,
             ),
         shape = RoundedCornerShape(28.dp),
@@ -102,7 +106,7 @@ fun LabCard(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = toy.title,
+                    text = title,
                     style = MaterialTheme.typography.titleLarge,
                     color = TextPrimary,
                     maxLines = 2,
@@ -110,7 +114,7 @@ fun LabCard(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = toy.subtitle,
+                    text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                     maxLines = 3,
@@ -134,7 +138,7 @@ fun LabCard(
                     .size(38.dp)
                     .clip(CircleShape)
                     .background(SurfaceRaised)
-                    .semantics { contentDescription = "Open ${toy.title}" },
+                    .semantics { contentDescription = openDescription },
                 contentAlignment = Alignment.Center,
             ) {
                 CompositionLocalProvider(LocalContentColor provides toy.accent) {

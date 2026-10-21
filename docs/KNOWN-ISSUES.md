@@ -39,12 +39,16 @@
 - Marbles 落底弹跳 20 秒才稳定 → 属阻尼参数选择，不足 5 秒时速度偏高，
   真机复核后再定。
 
-## 真机自动化注意（MIUI）
+## 真机自动化注意（MIUI，2026-10-21 实测确认）
 
-在 Xiaomi/MIUI 设备上，测试进程从后台拉起被测 App 会被 MIUI「后台弹出界面」
-安全机制拦截，`ActivityScenario` 用例会挂起等待。解决：在
-「设置 → 应用设置 → 应用管理 → TouchLab → 权限」中授予「后台弹出界面 =
-允许」。授权后 `connectedDebugAndroidTest` 与 `am instrument` 均可正常完成。
+1. **每次重装 APK 后需重新授权**：MIUI 重装后 UID 变化，「后台弹出界面」
+   授权随之失效，测试进程拉起 App 会被拦截（`MIUILOG- Permission Denied
+   Activity`）。需在「应用管理 → TouchLab → 权限管理 → 后台弹出界面 =
+   允许」重新授权；授权后用 `am instrument` 直跑可反复执行（不重装即稳定）。
+2. **玩具用例需关闭系统动画**：玩具用例用 Compose 手动帧时钟
+   （`autoAdvance=false`），真机动画开启时 Espresso 等 idle 会超时挂起；
+   测试前将开发者选项三个动画缩放临时设为 0，测后恢复。
+3. 关闭「MIUI 优化」不能替代上述 per-app 授权。
 
 ## 环境特定限制
 

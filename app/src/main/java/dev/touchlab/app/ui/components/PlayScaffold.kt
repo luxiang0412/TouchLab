@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -106,7 +107,7 @@ fun PlayScaffold(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_back),
-                    contentDescription = "Back to toys",
+                    contentDescription = stringResource(R.string.back_toys),
                     tint = TextPrimary,
                 )
             }
@@ -119,7 +120,7 @@ fun PlayScaffold(
             )
             Spacer(Modifier.width(10.dp))
             Text(
-                text = toy.title,
+                text = stringResource(toy.titleRes),
                 style = MaterialTheme.typography.titleLarge,
                 color = TextPrimary,
                 maxLines = 2,
@@ -158,7 +159,7 @@ fun PlayScaffold(
 
             HintOverlay(
                 visible = hintVisible && !paused,
-                text = toy.hint,
+                text = stringResource(toy.hintRes),
                 accent = toy.accent,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -195,13 +196,13 @@ fun PlayScaffold(
                         }
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = "Paused",
+                            text = stringResource(R.string.paused_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = TextPrimary,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "The simulation is resting.",
+                            text = stringResource(R.string.paused_desc),
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextSecondary,
                         )
@@ -217,7 +218,9 @@ fun PlayScaffold(
                 .padding(top = 10.dp, bottom = 16.dp),
         ) {
             Text(
-                text = if (paused) "Paused — nothing is moving." else toy.accessibilityHint,
+                text = stringResource(
+                    if (paused) R.string.paused_status else toy.accessibilityHintRes,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary,
                 textAlign = TextAlign.Center,
@@ -231,7 +234,7 @@ fun PlayScaffold(
             ) {
                 PlayPillButton(
                     icon = if (paused) R.drawable.ic_play else R.drawable.ic_pause,
-                    label = if (paused) "Resume" else "Pause",
+                    label = stringResource(if (paused) R.string.resume else R.string.pause),
                     accent = toy.accent,
                     filled = false,
                     onClick = {
@@ -243,7 +246,7 @@ fun PlayScaffold(
                 )
                 PlayPillButton(
                     icon = R.drawable.ic_reset,
-                    label = "Reset",
+                    label = stringResource(R.string.reset_label),
                     accent = toy.accent,
                     filled = true,
                     onClick = {
@@ -266,7 +269,7 @@ fun PlayScaffold(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_settings),
-                        contentDescription = "Open settings",
+                        contentDescription = stringResource(R.string.open_settings),
                         tint = TextPrimary,
                         modifier = Modifier.size(20.dp),
                     )

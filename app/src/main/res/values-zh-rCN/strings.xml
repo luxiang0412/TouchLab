@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TouchLab</string>
+    <string name="brand_tagline">微型物理玩具</string>
+    <string name="home_headline">挑一个来\n玩玩吧。</string>
+    <string name="home_sub">三个微型物理玩具。没有分数，没有催促。</string>
+    <string name="settings">设置</string>
+    <string name="version_prefix">版本 %1$s</string>
+    <string name="home_footer">为手指而做。离线可用。</string>
+
+    <string name="open_toy">打开%1$s</string>
+    <string name="back_toys">返回玩具列表</string>
+    <string name="open_settings">打开设置</string>
+    <string name="pause">暂停</string>
+    <string name="resume">继续</string>
+    <string name="reset_label">重置</string>
+    <string name="paused_title">已暂停</string>
+    <string name="paused_desc">模拟已暂停休息，没有在运行。</string>
+    <string name="paused_status">已暂停——一切静止。</string>
+
+    <string name="toy_title_jelly">软糖</string>
+    <string name="toy_subtitle_jelly">捏一捏，拉一拉，让它弹起来。</string>
+    <string name="toy_hint_jelly">按住并拖动软糖</string>
+    <string name="toy_a11y_jelly">软糖互动玩具：触摸并拖动来挤压和移动它。</string>
+
+    <string name="toy_title_dust">磁力尘埃</string>
+    <string name="toy_subtitle_dust">聚拢一个小小的宇宙。</string>
+    <string name="toy_hint_dust">按住聚拢尘埃</string>
+    <string name="toy_a11y_dust">磁力尘埃互动玩具：按住并保持以聚拢粒子。</string>
+
+    <string name="toy_title_marbles">弹珠</string>
+    <string name="toy_subtitle_marbles">拨一拨。弹一弹。再玩一次。</string>
+    <string name="toy_hint_marbles">拖动一颗弹珠并拨出</string>
+    <string name="toy_a11y_marbles">弹珠互动玩具：在托盘中拖动并拨动弹珠。</string>
+
+    <string name="gravity_on">重力：开</string>
+    <string name="gravity_off">重力：关</string>
+
+    <string name="settings_title">设置</string>
+    <string name="settings_subtitle">保持舒适。每项更改立即生效。</string>
+    <string name="setting_sound">音效</string>
+    <string name="setting_sound_desc">触摸、拨动和碰撞时的轻柔声音。</string>
+    <string name="setting_haptic">触觉反馈</string>
+    <string name="setting_haptic_desc">触摸和碰撞时轻震一下，绝不会每帧震动。</string>
+    <string name="setting_motion">减少动态效果</string>
+    <string name="setting_motion_desc">更平缓的漂浮、更柔和回弹、更少装饰。</string>
+    <string name="setting_language">语言</string>
+    <string name="setting_language_desc">中英双语，默认跟随系统。</string>
+    <string name="lang_system">跟随系统</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_en">English</string>
+    <string name="settings_done">完成</string>
+</resources>

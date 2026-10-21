@@ -1,5 +1,6 @@
 package dev.touchlab.app
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState
@@ -12,6 +13,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import dev.touchlab.app.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +23,8 @@ class TouchLabUiTest {
 
     @get:Rule
     val composeRule = createAndroidComposeRule<MainActivity>()
+
+    private fun text(@StringRes id: Int): String = composeRule.activity.getString(id)
 
     private fun openToy(tag: String) {
         // Physics toys animate every frame, so the shared test clock must not
@@ -45,9 +49,9 @@ class TouchLabUiTest {
         composeRule.onNodeWithTag("home_jelly_card").assertIsDisplayed()
         composeRule.onNodeWithTag("home_dust_card").assertIsDisplayed()
         composeRule.onNodeWithTag("home_marbles_card").assertIsDisplayed()
-        composeRule.onNode(hasText("Jelly")).assertIsDisplayed()
-        composeRule.onNode(hasText("Magnet Dust")).assertIsDisplayed()
-        composeRule.onNode(hasText("Marbles")).assertIsDisplayed()
+        composeRule.onNode(hasText(text(R.string.toy_title_jelly))).assertIsDisplayed()
+        composeRule.onNode(hasText(text(R.string.toy_title_dust))).assertIsDisplayed()
+        composeRule.onNode(hasText(text(R.string.toy_title_marbles))).assertIsDisplayed()
     }
 
     @Test
@@ -68,12 +72,12 @@ class TouchLabUiTest {
     @Test
     fun marblesGravityToggleAndReset() {
         openToy("home_marbles_card")
-        composeRule.onNodeWithText("Gravity on").assertIsDisplayed()
+        composeRule.onNodeWithText(text(R.string.gravity_on)).assertIsDisplayed()
         composeRule.onNodeWithTag("marbles_gravity_toggle").performClick()
         composeRule.mainClock.advanceTimeBy(100)
-        composeRule.onNodeWithText("Gravity off").assertIsDisplayed()
+        composeRule.onNodeWithText(text(R.string.gravity_off)).assertIsDisplayed()
         composeRule.onNodeWithTag("play_reset").performClick()
-        composeRule.onNodeWithText("Gravity off").assertIsDisplayed()
+        composeRule.onNodeWithText(text(R.string.gravity_off)).assertIsDisplayed()
         composeRule.onNodeWithTag("play_screen").assertIsDisplayed()
         returnHome()
     }
@@ -94,13 +98,13 @@ class TouchLabUiTest {
     @Test
     fun pauseResumeChangesLabel() {
         openToy("home_jelly_card")
-        composeRule.onNodeWithText("Pause").assertIsDisplayed()
+        composeRule.onNodeWithText(text(R.string.pause)).assertIsDisplayed()
         composeRule.onNodeWithTag("play_pause").performClick()
         composeRule.mainClock.advanceTimeBy(100)
-        composeRule.onNodeWithText("Resume").assertIsDisplayed()
+        composeRule.onNodeWithText(text(R.string.resume)).assertIsDisplayed()
         composeRule.onNodeWithTag("play_pause").performClick()
         composeRule.mainClock.advanceTimeBy(100)
-        composeRule.onNodeWithText("Pause").assertIsDisplayed()
+        composeRule.onNodeWithText(text(R.string.pause)).assertIsDisplayed()
         returnHome()
     }
 
@@ -162,6 +166,23 @@ class TouchLabUiTest {
         composeRule.mainClock.advanceTimeBy(400)
         composeRule.mainClock.autoAdvance = true
         composeRule.waitForIdle()
+        composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
+    }
+
+    @Test
+    fun languageSwitchWorksAndIsReversible() {
+        composeRule.onNodeWithTag("settings_button").performClick()
+        composeRule.onNodeWithTag("settings_sheet").assertIsDisplayed()
+        composeRule.onNodeWithTag("setting_language_zh").performClick()
+        // The activity recreates; the sheet comes back in Chinese.
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("settings_sheet").assertIsDisplayed()
+        composeRule.onNode(hasText("软糖")).assertIsDisplayed()
+        // Back to the system language again.
+        composeRule.onNodeWithTag("setting_language_system").performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("settings_sheet").assertIsDisplayed()
+        composeRule.onNodeWithTag("settings_done").performClick()
         composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
     }
 }

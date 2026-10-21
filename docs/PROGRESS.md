@@ -260,3 +260,30 @@ after its verification commands have actually run.
   - 触觉真实体感、音效听感待用户主观确认。
   - API 37 / minSdk 26 设备未实测；Macrobenchmark 未创建（backlog）。
 - 下一步：用户确认体感后，将 `TEST-REPORT` 最终判定升级为 DONE。
+
+---
+
+## Phase 7c — 中英双语与语言切换 + 真机最终回归（10/10）
+- 状态：DONE（功能与自动化全部通过；触觉体感/音效听感待用户主观确认）
+- 实现内容：
+  - 全部可见文案迁入资源：`values/strings.xml`（英文）+ `values-zh-rCN/`
+    （简体中文）；`Toy` 枚举改为资源 ID；首页/设置/实验页/无障碍描述全部本地化。
+  - 新增「语言 Language」设置：跟随系统 / 中文 / English，默认跟随系统；
+    选择经 SharedPreferences 保存，`MainActivity.attachBaseContext` 用
+    `createConfigurationContext` 生效（无第三方依赖，API 26+ 通用）。
+  - `res/xml/locales_config.xml` + manifest `localeConfig`（双语言，供 Play/系统按应用设语言）。
+  - UI 测试改造为语言无关（testTag + 资源字符串断言），新增语言切换用例。
+- 验证命令与退出码：
+  - `:app:testDebugUnitTest :app:assembleDebug` → 0
+  - `:app:lintDebug` → 0
+  - 模拟器 `connectedDebugAndroidTest` → 0（10/10）
+  - **真机 `am instrument` → OK (10 tests)**（Xiaomi POCO F5 / Android 14）
+  - 真机语言切换手工验证：中文首页/设置 → English → 跟随系统，均正确并有截图。
+- 证据：
+  - `docs/real-device-instrumentation.log`（10 tests OK）
+  - `docs/screenshots/real-home-zh.png`、`real-home-en.png`、
+    `real-settings-zh.png`、`real-settings-en.png`
+- 已知问题：
+  - MIUI 自动化限制见 `docs/KNOWN-ISSUES.md`（重装后需重授权、测试需关动画）。
+  - 触觉/音效主观体感仍待用户确认。
+- 下一步：用户确认体感后，`TEST-REPORT` 判定升级 DONE。

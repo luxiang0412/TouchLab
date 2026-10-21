@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.touchlab.app.feature.home.HomeScreen
+import dev.touchlab.app.localization.AppLanguage
 import dev.touchlab.app.feedback.SoundEngine
 import dev.touchlab.app.feedback.rememberHaptics
 import dev.touchlab.app.feedback.uiFeedback as playUiFeedback
@@ -34,6 +36,7 @@ fun TouchLabApp(versionName: String) {
     val repository = remember(context) { SettingsRepository(context) }
     val scope = rememberCoroutineScope()
     val settings by repository.settings.collectAsStateWithLifecycle(initialValue = Settings())
+    val languageCode = AppLanguage.current(context)
     val soundEngine = remember(context) { SoundEngine(context) }
     val haptics = rememberHaptics()
 
@@ -88,6 +91,7 @@ fun TouchLabApp(versionName: String) {
     if (settingsOpen) {
         SettingsSheet(
             settings = settings,
+            languageCode = languageCode,
             onSoundChanged = { enabled ->
                 scope.launch { repository.setSoundEnabled(enabled) }
             },
@@ -96,6 +100,12 @@ fun TouchLabApp(versionName: String) {
             },
             onReduceMotionChanged = { enabled ->
                 scope.launch { repository.setReduceMotion(enabled) }
+            },
+            onLanguageChanged = { code ->
+                if (code != AppLanguage.current(context)) {
+                    AppLanguage.set(context.applicationContext, code)
+                    (context as? Activity)?.recreate()
+                }
             },
             onDismiss = { settingsOpen = false },
             onUiFeedback = { playUiFeedback(soundEngine, settings, haptics) },
