@@ -83,6 +83,22 @@ Device coverage is PARTIAL: audio, vibration and 60 FPS performance still need
 verification on a real phone. See `docs/TEST-REPORT.md` and
 `docs/KNOWN-ISSUES.md` for the exact evidence and gaps.
 
+## Releases and CI
+
+Two GitHub Actions workflows are included:
+
+- `.github/workflows/android-ci.yml` — on every push/PR: JVM unit tests, Lint,
+  debug build, and uploads the debug APK as a build artifact.
+- `.github/workflows/release.yml` — pushing a `v*` tag builds the release and
+  debug APKs (signed when the `ANDROID_KEYSTORE_*` secrets are configured) and
+  creates a GitHub Release with the APK files attached.
+
+See `docs/RELEASE.md` for the step-by-step: create the repo, push, configure
+the signing secrets, and tag `v0.1.0`.
+
+> The GitHub Release APK is for sideloading/CI distribution. Publishing to the
+> Google Play store requires separate signing, an AAB and Play Console setup.
+
 ## Language
 
 English and Simplified Chinese are both supported. TouchLab follows the system

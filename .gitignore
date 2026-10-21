@@ -9,3 +9,8 @@ captures/
 .cxx/
 *.keystore
 *.jks
+
+# Release signing material (never commit)
+*.keystore
+*.jks
+*.b64

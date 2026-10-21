@@ -287,3 +287,21 @@ after its verification commands have actually run.
   - MIUI 自动化限制见 `docs/KNOWN-ISSUES.md`（重装后需重授权、测试需关动画）。
   - 触觉/音效主观体感仍待用户确认。
 - 下一步：用户确认体感后，`TEST-REPORT` 判定升级 DONE。
+
+---
+
+## Phase 8 — GitHub 发布工程化（CI + Release）
+- 状态：DONE（本地文件就绪；仓库创建/推送/Secret 由用户执行）
+- 实现内容：
+  - `app/build.gradle.kts` 增加条件签名：存在 `ANDROID_KEYSTORE_PATH` 等环境
+    变量时签名 release（供 CI），否则维持 unsigned（本地不受影响）。
+  - `.github/workflows/android-ci.yml`：push/PR 自动跑 testDebugUnitTest +
+    lintDebug + assembleDebug，并上传 debug APK artifact。
+  - `.github/workflows/release.yml`：推送 `v*` tag 时构建 release+debug APK
+    （配置 Secret 则签名），自动创建 GitHub Release 并附 APK 资产。
+  - `tools/create_release_keystore.sh` 与 `docs/RELEASE.md`：一键生成
+    keystore、配置 4 个 Actions Secret、打 tag 的完整步骤与仓库描述文案。
+  - `.gitignore` 补充 `*.keystore`/`*.jks`/`*.b64` 防止密钥入库。
+- 验证：本地 `assembleRelease`（无 Secret）仍 BUILD SUCCESSFUL（unsigned APK）。
+- 下一步：用户创建 GitHub 仓库 → push → 配置 Secret → `git tag v0.1.0 && push`
+  → Actions 自动产出 Release 与 APK。
