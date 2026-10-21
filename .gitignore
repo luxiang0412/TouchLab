@@ -14,3 +14,6 @@ captures/
 *.keystore
 *.jks
 *.b64
+
+# Local release signing workspace (never commit)
+.release/
