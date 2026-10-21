@@ -240,3 +240,23 @@ after its verification commands have actually run.
 - 下一步：
   - 真机接入后：重跑 connected 测试、实测音效/震动、跑 Macrobenchmark，
     完善 `TEST-REPORT` 的性能与设备覆盖部分，将判定升级为 DONE。
+
+---
+
+## Phase 7b — 真机补充测试（Xiaomi POCO F5 / Android 14 / 120Hz）
+- 状态：DONE（真机交互/自动化/性能/Rest 均完成；触觉体感与音效听感待用户主观确认）
+- 实现内容：
+  - 真机（无线调试 `adb connect`）安装并实测三玩具、设置、音效、生命周期。
+  - 确认 MIUI「后台弹出界面」限制并授予 TouchLab 权限后，自动 UI 测试在真机
+    上 9/9 通过（日志：`docs/real-device-instrumentation.log`）。
+  - 真机 `gfxinfo`：988 帧 / 2.94% janky / p50 14ms / p90 17ms / GPU 3ms（120Hz，debug）。
+  - 真机音效开关实测生效；设置杀进程后持久化实测；后台 8 次往返与旋转无崩溃。
+  - 真机截图：`docs/screenshots/real-*.png`。
+  - 测试期间临时关闭系统动画与屏幕常亮，结束后已恢复。
+- 验证命令与退出码：
+  - `am instrument … AndroidJUnitRunner` → OK (9 tests)（真机）
+  - `dumpsys gfxinfo` → 如上数值
+- 已知问题：
+  - 触觉真实体感、音效听感待用户主观确认。
+  - API 37 / minSdk 26 设备未实测；Macrobenchmark 未创建（backlog）。
+- 下一步：用户确认体感后，将 `TEST-REPORT` 最终判定升级为 DONE。

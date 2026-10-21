@@ -1,6 +1,6 @@
 # TouchLab 测试报告
 
-- 测试日期：2026-10-21（本地完成全部 Phase 0–7 验证）
+- 测试日期：2026-10-21（Phase 0–7）+ 2026-10-21 真机补充测试
 - 代码 commit：见 `git log --oneline`（报告最后一份提交）
 - OS / JDK / Gradle / AGP / Compose BOM：
   - Windows 11 10.0.26200 / Zulu JDK 17.0.3 / Gradle 9.4.1 / AGP 9.2.1 /
@@ -8,8 +8,11 @@
 - minSdk / targetSdk / compileSdk：26 / 36 / 37
 - 测试设备：
   - `touchlab_api34` 模拟器：Google APIs x86_64，Android 14 (API 34)，
-    1080×2400 @ 420dpi，软件渲染（AEHD 加速）。这是当前唯一的测试环境，
-    **没有真机**。
+    1080×2400 @ 420dpi，软件渲染（AEHD 加速）。
+  - **真机（无线调试连接）**：Xiaomi 22021211RC（POCO F5 / munch），
+    Android 14 (API 34)，1080×2400 @ 440dpi，120Hz 屏幕，12GB RAM。
+- 真机 UI 自动化说明：MIUI 默认拦截测试进程从后台拉起 App，需先在该机制内
+  授予 TouchLab「后台弹出界面」权限；授后可正常完成全部测试。
 
 ## 构建和静态检查
 
@@ -18,7 +21,8 @@
 | Debug 构建 | `gradlew :app:assembleDebug` | PASS | `app/build/outputs/apk/debug/app-debug.apk` |
 | JVM 单元测试 | `gradlew :app:testDebugUnitTest` | PASS (31/31) | `app/build/test-results/testDebugUnitTest/*.xml` |
 | Lint | `gradlew :app:lintDebug` | PASS（1 个 error 已修复后为 0） | `app/build/reports/lint-results-debug.html` |
-| UI 自动化 | `gradlew :app:connectedDebugAndroidTest` | PASS (9/9) | `app/build/outputs/androidTest-results/connected/debug/*.xml` |
+| UI 自动化（模拟器） | `gradlew :app:connectedDebugAndroidTest` | PASS (9/9) | `app/build/outputs/androidTest-results/connected/debug/*.xml` |
+| UI 自动化（真机） | `am instrument`（Xiaomi POCO F5, API 34） | PASS (9/9) | `docs/real-device-instrumentation.log` |
 | Release 构建 | `gradlew :app:assembleRelease` | PASS（unsigned APK） | `app/build/outputs/apk/release/app-release-unsigned.apk` |
 
 Lint 剩余告警均为预期项：targetSdk 36 < compileSdk 37（符合 Play target API
@@ -57,21 +61,22 @@ Marbles Gravity 开关与文案切换；Pause/Resume 文案切换；Settings 三
 | 后台往返 | HOME/回前台 ×10 | 暂停动画、恢复无大跳帧、无 Crash | 无 Crash/ANR | PASS |
 | 旋转 | Jelly 页面旋转至横屏再回 | 不崩溃、重置到安全态 | 无 Crash | PASS |
 | 窄屏+大字号 | 360dp 宽度，font_scale 1.4 | 文案可读、可滚动、无截断 | uiautomator bounds 证实无截断 | PASS |
-| 触觉 | 拖拽 Jelly | 按下/释放各一次轻震动 | 代码路径执行；**模拟器无振动硬件，未真机验证** | PARTIAL |
+| 触觉（真机） | 拖拽 Jelly | 按下/释放各一次轻震动 | 代码路径执行（真机上触发了 performHapticFeedback）；物理体感以用户确认为准 | 见文末 |
 
 ## 性能与稳定性
 
-- 构建类型：debug（模拟器无法代表硬件）；未在真机/Release 上测。
-- 测量方式：`dumpsys gfxinfo`（软件渲染模拟器），自研 Jelly 交互约 3 秒。
-- 观测值（仅作环境参考，不代表真机）：
-  - Total frames rendered: 197；Janky frames: 36%（90th GPU 有脉冲尖峰，
-    与模拟器软件渲染有关）。
+- 构建类型：debug。真机性能为硬件实测；模拟器数据仅作参考。
+- 测量方式：`dumpsys gfxinfo`。
+- **真机（Xiaomi POCO F5，120Hz 屏，debug 构建）** Jelly 快速拖拽约 3 秒：
+  - Total frames rendered: 988；Janky frames: 29（2.94%，modern 判定）；
+  - 50th percentile 14ms / 90th percentile 17ms；GPU p50 3ms / p90 3ms。
+- 模拟器（软件渲染）参考：197 帧 / 36% janky / 50th 53ms（不代表硬件）。
 - 无法测量的项目：
-  - 60 FPS 真机指标（无真机）；
   - Macrobenchmark 模块（未创建，属 v1.1 backlog）；
-  - 15 分钟连续游戏稳定性（本次实际交互约 4–5 分钟无 Crash/ANR）。
-- 稳定性：monkey+脚本式交互（8 次 Jelly 拖拽循环、Dust 30s 长按、6 次
-  Marbles 弹射、多次 Reset/开关）后 `logcat` 无 FATAL/ANR。
+  - 15 分钟连续游戏（本次脚本交互约 5 分钟无 Crash/ANR）。
+- 稳定性（真机）：三玩具脚本交互（Jelly 拖拽 6 轮+Reset/Pause、Dust 20 秒长按、
+  Marbles 弹射 6 次+重力开关+Reset），后台往返 8 次与旋转测试后
+  `logcat` 无 FATAL/ANR。
 
 ## 截图清单（docs/screenshots/）
 
@@ -82,21 +87,26 @@ Marbles Gravity 开关与文案切换；Pause/Resume 文案切换；Settings 三
 - `settings-final.png` — Settings 面板
 - `home-narrow-font.png` — 360dp 宽 + 1.4 倍字号首页
 - `phase5-settings-toggled.png` / `phase5-settings-persisted.png` — 设置更改与持久化证据
+- 真机截图（`real-*`）：`real-home.png`、`real-jelly-rest/press.png`、
+  `real-dust-idle/gather.png`、`real-marbles-motion/floating.png`、`real-settings.png`
 
 ## 缺陷与风险
 
 - 阻塞项：无。
 - 非阻塞项：
-  - 模拟器无振动/音频硬件：音效、触觉仅代码级与 log 验证，需真机复测。
-  - 模拟器为软件渲染，性能数据不可当硬件结论。
+  - 触觉的真实体感与音效听感需用户在真机上主观确认（逻辑与设备端行为已
+    验证：设置持久化、开关生效、Haptics/SoundPool 调用执行）。
+  - API 37 与 minSdk 26 设备仍未实测（镜像已就绪，可后续建 AVD/真机补测）。
+  - Macrobenchmark 模块未创建（v1.1 backlog）。
   - `app-release-unsigned.apk` 未签名，上架 Play 前需正确签名并核验包名
     `dev.touchlab.app` 归属与唯一性。
-  - 首次冷启动在模拟器约 3–4 秒（软件渲染），真机需复测。
 
 ## 最终判定
 
-PARTIAL
+PARTIAL → 待真机主观项确认后升级 DONE
 
-依据：全部自动化测试（31 单测 + 9 UI）与构建/lint/release 均通过，三个玩具
-真实可玩；但**没有真机**，音效/触觉硬件输出与 60 FPS 性能目标无法真实验收，
-因此不能宣称 DONE。除该设备覆盖缺口外，MVP 功能验收全部满足。
+依据：全部自动化测试（31 单测；9 UI 在模拟器与真机各跑一遍均通过）、构建 /
+lint / release 通过；真机（Xiaomi POCO F5）完成三玩具交互、设置持久化、
+音效开关、后台/旋转/稳定性与 120Hz 帧统计（p50 14ms）验证。剩余待确认项为：
+真机触觉体感与音效听感的用户主观确认、API 37 / minSdk 26 设备覆盖、
+Macrobenchmark（backlog）。这些均不阻塞 MVP 交付判断。

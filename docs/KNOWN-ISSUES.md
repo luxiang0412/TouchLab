@@ -2,17 +2,16 @@
 
 最后更新：2026-10-21
 
-## 覆盖缺口（无设备，非代码缺陷）
+## 覆盖缺口
 
-1. **无真机**：所有运行验证均在 `touchlab_api34` 模拟器（API 34，软件渲染）
-   上完成。触觉（Haptics）、真实扬声器音质、真实手势与硬件性能未在真机验证。
-   - 计划：接入一台 Android 真机后执行 `connectedDebugAndroidTest`、
-     音效/震动开关实测、`gfxinfo`/Macrobenchmark。
-2. **性能指标未测量**：`dumpsys gfxinfo` 数据来自软件渲染模拟器，与真机无
-   可比性；未创建 `:benchmark` Macrobenchmark 模块（已列入 backlog）。
-3. **API 36/37 系统未实测**：`system-images;android-37.0;google_apis;x86_64`
-   已安装但未创建 AVD 运行；当前仅在 API 34 上验证。minSdk 26 边界也未实测。
-4. **15 分钟连续游玩** 未完整执行（本次约 4–5 分钟无 Crash/ANR）。
+1. **已真机验证（2026-10-21，Xiaomi POCO F5 / Android 14 / 120Hz）**：
+   三玩具交互、音效开关、设置持久化、后台/旋转/稳定性、UI 自动化 9/9、
+   gfxinfo 帧统计（p50 14ms）。真实触觉体感与音效听感待用户主观确认。
+2. **性能**：真机 `gfxinfo` 已记录；未创建 `:benchmark` Macrobenchmark 模块
+   （已列入 backlog）。
+3. **API 37 / minSdk 26 设备未实测**：`system-images;android-37.0;
+   google_apis;x86_64` 已安装但未建 AVD 运行；minSdk 26 边界未实测。
+4. **15 分钟连续游玩** 未完整执行（本次脚本交互约 5 分钟无 Crash/ANR）。
 
 ## 已知问题
 
@@ -39,6 +38,13 @@
 - Dust 吸引不够强/粒子散开 → 调大引力、调小旋涡，并加核排斥形成光环。
 - Marbles 落底弹跳 20 秒才稳定 → 属阻尼参数选择，不足 5 秒时速度偏高，
   真机复核后再定。
+
+## 真机自动化注意（MIUI）
+
+在 Xiaomi/MIUI 设备上，测试进程从后台拉起被测 App 会被 MIUI「后台弹出界面」
+安全机制拦截，`ActivityScenario` 用例会挂起等待。解决：在
+「设置 → 应用设置 → 应用管理 → TouchLab → 权限」中授予「后台弹出界面 =
+允许」。授权后 `connectedDebugAndroidTest` 与 `am instrument` 均可正常完成。
 
 ## 环境特定限制
 

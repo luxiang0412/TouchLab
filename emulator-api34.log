@@ -410,3 +410,5 @@ INFO         | Ignore IPv6 address: 2032:7cfe:2902:0:a0d6:7bfe:2902:0
 INFO         | Ignore IPv6 address: 1838:7cfe:2902:0:a0d6:7bfe:2902:0
 INFO         | Ignore IPv6 address: 1838:7cfe:2902:0:a0d6:7bfe:2902:0
 INFO         | Ignore IPv6 address: 1838:7cfe:2902:0:a0d6:7bfe:2902:0
+ERROR        | SDKCtl multi-touch: Invalid packet signature 444b4300 for packet type 512, size 8019
+ERROR        | bad color buffer handle 2752
