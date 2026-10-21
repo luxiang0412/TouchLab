@@ -1,3 +1,6 @@
+[![Android CI](https://github.com/luxiang0412/TouchLab/actions/workflows/android-ci.yml/badge.svg)](https://github.com/luxiang0412/TouchLab/actions/workflows/android-ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/luxiang0412/TouchLab)](https://github.com/luxiang0412/TouchLab/releases)
+
 # TouchLab
 
 **Tiny physics toys for your fingertips.**
@@ -9,6 +12,8 @@ TouchLab is a native Android playground with three tactile physics toys:
 - **Marbles** — flick coral marbles around a glass tray, with optional gravity.
 
 Everything runs offline. No account, no network permission, no ads.
+
+**Download:** grab the signed APK from the [latest release](https://github.com/luxiang0412/TouchLab/releases/latest).
 
 ## Tech stack
 
