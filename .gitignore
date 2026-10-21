@@ -17,3 +17,7 @@ captures/
 
 # Local release signing workspace (never commit)
 .release/
+
+# Local build/emulator logs
+*.log
+!docs/**/*.log
